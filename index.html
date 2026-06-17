@@ -725,7 +725,7 @@ footer{
       <div class="edu-card r r1">
         <div class="edu-num">01</div>
         <div class="edu-icon">🎓</div>
-        <div class="edu-date">2021 — Present</div>
+        <div class="edu-date">2021 — 2025</div>
         <h3>B.A. in Computer Education</h3>
         <div class="edu-place">Tishik International University, Erbil</div>
         <p>Final-year student combining foundational computer science with educational theory, teaching methodologies, and real classroom practice. Completed research and hands-on pedagogical training throughout the program.</p>
@@ -839,40 +839,80 @@ footer{
 
 <script>
 // Nav scroll
-const nav=document.getElementById('nav');
-window.addEventListener('scroll',()=>{
-  nav.classList.toggle('scrolled',window.scrollY>60);
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
 });
 
 // Reveal on scroll
-const items=document.querySelectorAll('.r');
-const io=new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')});
-},{threshold:0.1});
-items.forEach(el=>io.observe(el));
+const items = document.querySelectorAll('.r');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('vis');
+  });
+}, { threshold: 0.1 });
+items.forEach(el => io.observe(el));
 
 // Skill bar animation
-const bars=document.querySelectorAll('.skill-fill');
-const bObs=new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      e.target.style.width=e.target.dataset.w+'%';
+const bars = document.querySelectorAll('.skill-fill');
+const bObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.width = e.target.dataset.w + '%';
       bObs.unobserve(e.target);
     }
   });
-},{threshold:0.5});
-bars.forEach(b=>bObs.observe(b));
+}, { threshold: 0.5 });
+bars.forEach(b => bObs.observe(b));
 
-// Contact form
-document.getElementById('cf').addEventListener('submit',function(e){
+
+// ==========================
+// TELEGRAM FORM INTEGRATION
+// ==========================
+
+const BOT_TOKEN = "YOUR_BOT_TOKEN_HERE";   // <-- put your bot token here
+const CHAT_ID = "YOUR_CHAT_ID_HERE";       // <-- your Telegram user/chat ID
+
+document.getElementById('cf').addEventListener('submit', async function (e) {
   e.preventDefault();
-  this.style.display='none';
-  document.getElementById('fok').style.display='block';
-  setTimeout(()=>{
-    this.reset();
-    this.style.display='flex';
-    document.getElementById('fok').style.display='none';
-  },5000);
+
+  const name = document.getElementById('fn').value;
+  const email = document.getElementById('fe').value;
+  const message = document.getElementById('fm').value;
+
+  const text =
+`📩 New Portfolio Message
+
+👤 Name: ${name}
+📧 Email: ${email}
+💬 Message: ${message}`;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: text
+      })
+    });
+
+    // success UI
+    this.style.display = 'none';
+    document.getElementById('fok').style.display = 'block';
+
+    setTimeout(() => {
+      this.reset();
+      this.style.display = 'flex';
+      document.getElementById('fok').style.display = 'none';
+    }, 5000);
+
+  } catch (err) {
+    alert("Failed to send message to Telegram.");
+    console.error(err);
+  }
 });
 </script>
 </body>
